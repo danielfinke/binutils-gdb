@@ -276,13 +276,13 @@ proc jit_reader_test {} {
 
     with_test_prefix "test dwarf unwinder" {
 	# Check that the DWARF unwinder does not crash in presence of
-	# JIT objfiles.
+	# JIT objfiles and that line mappings are properly displayed.
 	gdb_test "up"
 	gdb_breakpoint "*function_add" temporary
-	gdb_test "cont" ".*Temporary breakpoint ${any} in jit_function_add .*"
+	gdb_test "cont" ".*Temporary breakpoint ${any} jit_function_add ${any} at .*"
 	gdb_test "bt" \
 	    [multi_line \
-		 "#0 ${any} in jit_function_add ${any}" \
+		 "#0 ${any} jit_function_add ${any} at ${any}" \
 		 "#1 ${any} in main ${any}" \
 		]
     }

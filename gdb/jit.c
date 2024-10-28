@@ -665,6 +665,11 @@ jit_object_close_impl (struct gdb_symbol_callbacks *cb,
   objfile *objfile = objfile::make (nullptr, current_program_space,
 				    objfile_name.c_str (), OBJF_NOT_FILENAME);
   objfile->per_bfd->gdbarch = priv_data->gdbarch;
+  /* Spoof text section to avoid `sect_index_text not initialized` error when
+     getting the PC value from a line table entry, which requires the text
+     section offset.  */
+  objfile->section_offsets.push_back (0);
+  objfile->sect_index_text = 0;
 
   for (gdb_symtab &symtab : obj->symtabs)
     finalize_symtab (&symtab, objfile);

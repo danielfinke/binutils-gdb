@@ -21,6 +21,18 @@
 struct jithost_abi_bounds
 {
   const char *begin, *end;
+
+  /* Number of lines mapped in line_mapping.  */
+  size_t line_count;
+
+  /* Mapping of lines to instruction addresses.  */
+  struct jithost_line_mapping *line_mapping;
+};
+
+struct jithost_line_mapping
+{
+  int line;
+  const char *pc;
 };
 
 struct jithost_abi

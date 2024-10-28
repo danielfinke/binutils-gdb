@@ -47,7 +47,9 @@ read_debug_info (struct gdb_reader_funcs *self,
 {
   struct jithost_abi *symfile = memory;
   struct gdb_object *object = cbs->object_open (cbs);
-  struct gdb_symtab *symtab = cbs->symtab_open (cbs, object, "");
+  struct gdb_symtab *symtab
+    = cbs->symtab_open (cbs, object, "jit-reader-host.c");
+  struct gdb_line_mapping *line_mapping;
 
   struct reader_state *state = (struct reader_state *) self->priv_data;
 
@@ -66,6 +68,15 @@ read_debug_info (struct gdb_reader_funcs *self,
 		   (GDB_CORE_ADDR) symfile->function_add.begin,
 		   (GDB_CORE_ADDR) symfile->function_add.end,
 		   "jit_function_add");
+  line_mapping = malloc (symfile->function_add.line_count
+			   * sizeof (struct gdb_line_mapping));
+  cbs->target_read ((GDB_CORE_ADDR) symfile->function_add.line_mapping,
+		    line_mapping,
+		    symfile->function_add.line_count
+		      * sizeof (struct jithost_line_mapping));
+  cbs->line_mapping_add (cbs, symtab, symfile->function_add.line_count,
+			 line_mapping);
+  free (line_mapping);
 
   cbs->symtab_close (cbs, symtab);
   cbs->object_close (cbs, object);

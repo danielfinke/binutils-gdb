@@ -59,6 +59,7 @@ main (int argc, char **argv)
   char *code = mmap (NULL, getpagesize (), PROT_WRITE | PROT_EXEC,
 		     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   char *code_end = code;
+  size_t line_count;
 
   assert (code != MAP_FAILED);
 
@@ -77,6 +78,17 @@ main (int argc, char **argv)
   symfile->function_add.begin = code_end;
   code_end += sizeof (jit_function_add_code);
   symfile->function_add.end = code_end;
+
+  line_count = 3;
+  symfile->function_add.line_count = line_count;
+  symfile->function_add.line_mapping
+    = malloc (line_count * sizeof (struct jithost_line_mapping));
+  symfile->function_add.line_mapping[0].line = 50;
+  symfile->function_add.line_mapping[0].pc = symfile->function_add.begin;
+  symfile->function_add.line_mapping[1].line = 51;
+  symfile->function_add.line_mapping[1].pc = symfile->function_add.begin + 3;
+  symfile->function_add.line_mapping[2].line = 52;
+  symfile->function_add.line_mapping[2].pc = symfile->function_add.begin + 6;
 
   /* Bounds of the whole object.  */
   symfile->object.begin = code;
